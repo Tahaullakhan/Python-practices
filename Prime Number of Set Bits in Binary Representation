@@ -1,0 +1,19 @@
+class Solution(object):
+    def countPrimeSetBits(self, left, right):
+        total=0
+        for i in range(left,right+1):
+            nbits=0
+            n=i
+            while(n>0):
+                if(n%2==1):
+                    nbits+=1
+                n/=2
+            prime=True
+            if(nbits<=1):
+                prime=False
+            for j in range(2,int(math.sqrt(nbits))+1):
+                if(nbits%j==0):
+                    prime=False
+            if(prime):
+                total+=1
+        return total
