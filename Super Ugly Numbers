@@ -1,0 +1,21 @@
+class Solution:
+    def nthSuperUglyNumber(self, n: int, primes: list[int]) -> int:
+        minPQ = []
+        
+        # Initialize the priority queue with the first prime multiples
+        for prime in primes:
+            heapq.heappush(minPQ, (prime, 0, prime))  # (value, index in output, prime factor)
+        
+        output = [1]  # The first super ugly number is always 1
+
+        while len(output) < n:
+            value, idx, prime = heapq.heappop(minPQ)
+            
+            # Avoid adding duplicate values to the output list
+            if value != output[-1]:
+                output.append(value)
+            
+            # Generate the next multiple of the current prime
+            heapq.heappush(minPQ, (output[idx + 1] * prime, idx + 1, prime))
+        
+        return output[n - 1]
