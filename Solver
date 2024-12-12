@@ -1,0 +1,61 @@
+class Solution:
+    def __init__(self):
+        self.emptyCells = []
+        self.sum_total = 0
+        self.board = None
+        self.rows = None
+        self.cols = None
+        self.boxes = None
+
+    def backtrack(self, idx):
+        if self.sum_total == 0:
+            return True
+        x, y = self.emptyCells[idx]
+        row_x = self.rows[x]
+        col_y = self.cols[y]
+        box_xy = self.boxes[3*(x//3) + (y//3)]
+        while True:
+            candidates = row_x&col_y&box_xy
+            nxt = candidates&~(candidates-1)
+            if nxt == 0:
+                return False
+            row_x ^= nxt
+            col_y ^= nxt
+            box_xy ^= nxt
+            self.rows[x] ^= nxt
+            self.cols[y] ^= nxt
+            self.sum_total -= 3*nxt
+            self.boxes[3*(x//3) + (y//3)] ^= nxt
+            if self.backtrack(idx+1):
+                self.board[x][y] = str(int(math.log(nxt, 2)+1))
+                return True
+            self.rows[x] ^= nxt
+            self.cols[y] ^= nxt
+            self.boxes[3*(x//3) + (y//3)] ^= nxt
+            self.sum_total += 3*nxt
+
+    def solve(self):
+        self.rows = [2**9-1]*9
+        self.cols = [2**9-1]*9
+        self.boxes = [2**9-1]*9
+        self.sum_total = 27*(2**9-1)
+        for i in range(9):
+            for j in range(9):
+                if self.board[i][j] != ".":
+                    val = int(self.board[i][j])
+                    mask = 1 << (val-1)
+                    self.rows[i] ^= mask
+                    self.cols[j] ^= mask
+                    self.boxes[3*(i//3) + (j//3)] ^= mask
+                    self.sum_total -= 3*mask
+                else:
+                    self.emptyCells.append((i, j))
+        
+        self.backtrack(0)
+    
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        self.board = board
+        self.solve()
